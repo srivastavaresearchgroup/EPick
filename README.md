@@ -1,7 +1,9 @@
 # Requirements
+```
 Python 3.8
 Tensorflow 2.5
 CUDA 11.2
+```
 
 # Cite
 
