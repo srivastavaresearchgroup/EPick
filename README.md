@@ -1,3 +1,6 @@
+# EPick
+This is an implementation of the EPick mode (https://arxiv.org/abs/2109.02567).
+
 # Requirements
 ```
 Python 3.8
