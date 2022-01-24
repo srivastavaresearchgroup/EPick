@@ -1,3 +1,8 @@
+# Requirements
+Python 3.8
+Tensorflow 2.5
+CUDA 11.2
+
 # Cite
 
 If you use this code for your research, please cite it with the following bibtex entry.
