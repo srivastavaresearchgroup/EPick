@@ -1,6 +1,14 @@
 # EPick
 EPick: Multi-Class Attention-based U-shaped Neural Network for Earthquake Detection and Seismic Phase Picking
 
-Reference:
+Cite
 
-Li, Wei, Megha Chakraborty, Darius Fenner, Johannes Faber, Kai Zhou, Georg Ruempker, Horst Stoecker, and Nishtha Srivastava. "EPick: Multi-Class Attention-based U-shaped Neural Network for Earthquake Detection and Seismic Phase Picking." arXiv preprint arXiv:2109.02567 (2021).
+If you use this code for your research, please cite it with the following bibtex entry.
+
+@article{li2021epick,
+  title={EPick: Multi-Class Attention-based U-shaped Neural Network for Earthquake Detection and Seismic Phase Picking},
+  author={Li, Wei and Chakraborty, Megha and Fenner, Darius and Faber, Johannes and Zhou, Kai and Ruempker, Georg and Stoecker, Horst and Srivastava, Nishtha},
+  journal={arXiv preprint arXiv:2109.02567},
+  year={2021}
+}
+
