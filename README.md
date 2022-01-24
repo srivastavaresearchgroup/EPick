@@ -1,7 +1,4 @@
-# EPick
-EPick: Multi-Class Attention-based U-shaped Neural Network for Earthquake Detection and Seismic Phase Picking
-
-Cite
+# Cite
 
 If you use this code for your research, please cite it with the following bibtex entry.
 
