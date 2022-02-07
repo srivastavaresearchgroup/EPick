@@ -25,7 +25,7 @@ CUDA 11.2
   }
   ```
 
-  [2] The INSTANCE dataset can be downloaded from (http://doi.org/10.13127/instance) or (https://github.com/ingv/instance).
+  >[2] The INSTANCE dataset can be downloaded from (http://doi.org/10.13127/instance) or (https://github.com/ingv/instance).
   ```
   @article{michelini2021instance,
     title={INSTANCE--the Italian seismic dataset for machine learning},
