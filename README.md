@@ -8,11 +8,13 @@ Tensorflow 2.5
 CUDA 11.2
 ```
 # Data
-## * data format: .tfrecords
+## data format: 
 
-## * data source
+>.tfrecords
 
-  [1] The details of the STEAD dataset can be found in (https://github.com/smousavi05/STEAD)
+## data source
+
+  >[1] The details of the STEAD dataset can be found in (https://github.com/smousavi05/STEAD)
   ```
   @article{mousavi2019stanford,
     title={STanford EArthquake Dataset (STEAD): A Global Data Set of Seismic Signals for AI},
