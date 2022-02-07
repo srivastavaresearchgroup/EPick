@@ -8,9 +8,9 @@ Tensorflow 2.5
 CUDA 11.2
 ```
 # Data
-(1) data format: .tfrecords
+## * data format: .tfrecords
 
-(2) data source
+## * data source
 
   [1] The details of the STEAD dataset can be found in (https://github.com/smousavi05/STEAD)
   ```
