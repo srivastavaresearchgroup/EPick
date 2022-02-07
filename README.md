@@ -7,6 +7,16 @@ Python 3.8
 Tensorflow 2.5
 CUDA 11.2
 ```
+# Data
+The details of the STEAD dataset can be found in (https://github.com/smousavi05/STEAD) and 
+@article{mousavi2019stanford,
+  title={STanford EArthquake Dataset (STEAD): A Global Data Set of Seismic Signals for AI},
+  author={Mousavi, S Mostafa and Sheng, Yixiao and Zhu, Weiqiang and Beroza, Gregory C},
+  journal={IEEE Access},
+  year={2019},
+  publisher={IEEE}
+}
+
 
 # Cite
 If you use this code for your research, please cite it with the following bibtex entry.
