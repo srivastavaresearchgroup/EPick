@@ -1,2 +1,2 @@
 
-The code can be accessed in [link to PhaseNet] (https://github.com/wayneweiqiang/PhaseNet)
+The code can be accessed in https://github.com/wayneweiqiang/PhaseNet
