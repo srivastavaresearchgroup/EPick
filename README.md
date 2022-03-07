@@ -4,7 +4,7 @@ This is an implementation of the EPick model (https://arxiv.org/abs/2109.02567).
 # Requirements
 ```
 Python 3.8
-Tensorflow 2.5
+Tensorflow-gpu 2.5
 CUDA 11.2
 ```
 # Data
