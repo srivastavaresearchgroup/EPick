@@ -13,31 +13,31 @@ def model (inputs, num_classes, is_training):
     dropout_keep_prob = tf.where(is_training, 0.2, 1.0)
 
     ###========== Encoder Section ==============================================================
-    conv0_1 = layers.conv_btn1(inputs, 3, 32, 'conv0_1', is_training  = is_training)
-    conv0_2 = layers.conv_btn1(conv0_1, 3, 32, 'conv0_2', is_training = is_training)
+    conv0_1 = layers.conv_btn(inputs, 3, 32, 'conv0_1', is_training  = is_training)
+    conv0_2 = layers.conv_btn(conv0_1, 3, 32, 'conv0_2', is_training = is_training)
     pool0   = layers.maxpool(conv0_2, 2,  'pool0') ## [4, 3000, 32]
 
-    conv1_1 = layers.conv_btn1(pool0, 3, 32, 'conv1_1', is_training  = is_training)
-    conv1_2 = layers.conv_btn1(conv1_1, 3, 32, 'conv1_2', is_training = is_training)
+    conv1_1 = layers.conv_btn(pool0, 3, 32, 'conv1_1', is_training  = is_training)
+    conv1_2 = layers.conv_btn(conv1_1, 3, 32, 'conv1_2', is_training = is_training)
     pool1   = layers.maxpool(conv1_2, 4,  'pool1') # [4, 750, 32]
 
-    conv2_1 = layers.conv_btn1(pool1,   3, 32, 'conv2_1', is_training = is_training)
-    conv2_2 = layers.conv_btn1(conv2_1, 3, 32, 'conv2_2', is_training = is_training)
+    conv2_1 = layers.conv_btn(pool1,   3, 32, 'conv2_1', is_training = is_training)
+    conv2_2 = layers.conv_btn(conv2_1, 3, 32, 'conv2_2', is_training = is_training)
     pool2   = layers.maxpool(conv2_2, 4,   'pool2')
     drop2   = layers.dropout(pool2, dropout_keep_prob, 'drop2')  ## [4,188, 32]
 
-    conv3_1 = layers.conv_btn1(drop2,   3, 64, 'conv3_1', is_training = is_training)
-    conv3_2 = layers.conv_btn1(conv3_1, 3, 64, 'conv3_2', is_training = is_training)
+    conv3_1 = layers.conv_btn(drop2,   3, 64, 'conv3_1', is_training = is_training)
+    conv3_2 = layers.conv_btn(conv3_1, 3, 64, 'conv3_2', is_training = is_training)
     pool3   = layers.maxpool(conv3_2, 4,   'pool3')
     drop3   = layers.dropout(pool3, dropout_keep_prob, 'drop3') # [4, 47, 64]
 
-    conv4_1 = layers.conv_btn1(drop3,   3, 64, 'conv4_1', is_training = is_training)
-    conv4_2 = layers.conv_btn1(conv4_1, 3, 64, 'conv4_2', is_training = is_training)
+    conv4_1 = layers.conv_btn(drop3,   3, 64, 'conv4_1', is_training = is_training)
+    conv4_2 = layers.conv_btn(conv4_1, 3, 64, 'conv4_2', is_training = is_training)
     pool4   = layers.maxpool(conv4_2, 4,   'pool4')
     drop4   = layers.dropout(pool4, dropout_keep_prob, 'drop4') #[4, 12, 64]
 
-    conv5_1 = layers.conv_btn1(drop4,   3, 128, 'conv5_1', is_training = is_training)
-    conv5_2 = layers.conv_btn1(conv5_1, 3, 128, 'conv5_2', is_training = is_training)
+    conv5_1 = layers.conv_btn(drop4,   3, 128, 'conv5_1', is_training = is_training)
+    conv5_2 = layers.conv_btn(conv5_1, 3, 128, 'conv5_2', is_training = is_training)
     drop5   = layers.dropout(conv5_2, dropout_keep_prob, 'drop5') # [4, 12, 128]
 
     ### ======================================== Decoder part ======================================
@@ -53,7 +53,7 @@ def model (inputs, num_classes, is_training):
     attention_conv6_1 = attention_layer_1([concat6_1, conv4_2])
 
     concat6         = layers.concat(upsample61, attention_conv6_1, 'concat6')
-    conv6_1   = layers.conv_btn1(concat6, 3, 128, 'conv6_1', is_training = is_training)
+    conv6_1   = layers.conv_btn(concat6, 3, 128, 'conv6_1', is_training = is_training)
     drop6     = layers.dropout(conv6_1, dropout_keep_prob, 'drop6') # [4, 47, 128]
 
     upsample7     = layers.deconv_upsample(drop6, 4,  'upsample7')
@@ -65,33 +65,33 @@ def model (inputs, num_classes, is_training):
     attention_conv7_1 = attention_layer_2([concat7_1, conv3_2])
 
     concat7         = layers.concat(upsample7, attention_conv7_1, 'concat7')
-    conv7_1   = layers.conv_btn1(concat7,       3, 64, 'conv7_1', is_training = is_training)
+    conv7_1   = layers.conv_btn(concat7,       3, 64, 'conv7_1', is_training = is_training)
     drop7     = layers.dropout(conv7_1, dropout_keep_prob, 'drop7') # (4, 188, 64)
 
-    upsample81     = layers.deconv_upsample(drop7, 4,  'upsample8')
-    upsample81    = tf.keras.layers.Cropping1D(cropping=((0, 2)))(upsample81)
+    upsample81 = layers.deconv_upsample(drop7, 4,  'upsample8')
+    upsample81 = tf.keras.layers.Cropping1D(cropping=((0, 2)))(upsample81)
 
     concat8_1 = tf.concat(values=[layers.maxpool(conv0_2, 8, 'down_0_2'), 
                                 layers.maxpool(conv1_2,  4, 'down_1_2')], axis =2, name ='concat8_1') # (4, 750, 64)
     attention_layer_3 = tfa.layers.MultiHeadAttention(head_size = 2, num_heads= 2)
     attention_conv8_1 = attention_layer_3([concat8_1, conv2_2])
 
-    concat8       = layers.concat(upsample81, attention_conv8_1, 'concat8')
-    conv8_1 = layers.conv_btn1(concat8, 3, 32, 'conv8_1', is_training = is_training) # (4, 750, 32)
+    concat8 = layers.concat(upsample81, attention_conv8_1, 'concat8')
+    conv8_1 = layers.conv_btn(concat8, 3, 32, 'conv8_1', is_training = is_training) # (4, 750, 32)
 
-    upsample91     = layers.deconv_upsample(conv8_1, 4, 'upsample9')
+    upsample91 = layers.deconv_upsample(conv8_1, 4, 'upsample9')
     attention_layer_4 = tfa.layers.MultiHeadAttention(head_size = 2, num_heads= 2)
     attention_conv9_1 = attention_layer_4([layers.maxpool(conv0_2, 2, 'down_0_2'), conv1_2])
     
-    concat9       = layers.concat(upsample91, attention_conv9_1,  'concat9')
-    conv9_1 = layers.conv_btn1(concat9, 3, 32, 'conv9_1', is_training = is_training) # [4, 3000, 32]
+    concat9 = layers.concat(upsample91, attention_conv9_1,  'concat9')
+    conv9_1 = layers.conv_btn(concat9, 3, 32, 'conv9_1', is_training = is_training) # [4, 3000, 32]
 
-    upsample101          = layers.deconv_upsample(conv9_1, 2, 'upsample10')
+    upsample101 = layers.deconv_upsample(conv9_1, 2, 'upsample10')
     attention_layer_5 = tfa.layers.MultiHeadAttention(head_size = 2, num_heads= 1)
     attention_conv10_1 = attention_layer_5([conv0_2, conv0_2])
 
-    concat10       = layers.concat(upsample101, attention_conv10_1, 'concat10')
-    conv10_1 = layers.conv_btn1(concat10, 3, 32, 'conv10_1', is_training = is_training) # [4, 6000, 32]
+    concat10 = layers.concat(upsample101, attention_conv10_1, 'concat10')
+    conv10_1 = layers.conv_btn(concat10, 3, 32, 'conv10_1', is_training = is_training) # [4, 6000, 32]
 
     score  = layers.conv(conv10_1, 1, num_classes, 'score', activation_fn = None)
     logits = tf.reshape(score, (-1, num_classes))
@@ -152,12 +152,11 @@ def train(loss, learning_rate, learning_rate_decay_steps, learning_rate_decay_ra
     tf.compat.v1.summary.scalar("learning_rate", decayed_learning_rate)
     return train_op
 
-def predict(logits, batch_size, image_size):
-    predicted_images = tf.reshape(tf.argmax(logits, axis = 1), [batch_size, image_size])
-    return predicted_images
+def predict(logits, batch_size, waveform_length):
+    prediction = tf.reshape(tf.argmax(logits, axis = 1), [batch_size, waveform_length])
+    return prediction
   
-def predict2(logits, batch_size, image_size):
+def predict2(logits, batch_size, waveform_length):
     logits = tf.nn.softmax(logits)
-
-    predicted_images = tf.reshape(logits, [batch_size, image_size, 3])
-    return predicted_images
+    prediction = tf.reshape(logits, [batch_size, waveform_length, 3])
+    return prediction
