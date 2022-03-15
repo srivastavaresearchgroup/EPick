@@ -10,7 +10,7 @@ Tensorflow 2.5
 python ./Dataprocessing/data_labeling.py file(e.g., h5 format) catalog_list(e.g., catalog.csv) output_path
 
 # Training
-python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving_path hyperparameters setting like batch_size,  epochs
+python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving_path with hyperparameters including batch_size,  epochs, learning_rate, weight_decay_factor, etc
 
 # Testing
 
