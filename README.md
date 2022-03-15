@@ -11,13 +11,13 @@ CUDA 11.2
 python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving_path hyperparameters setting like batch_size,  epochs
 
 # Testing
-```
+
 [1] Epick testing: python ./Test/Epick/epick_test.py --tfrecords_dir datapath ---checkpoint_path saveed_model
 
 [2] PhaseNet: the code can be accessed in (https://github.com/wayneweiqiang/PhaseNet)
 
 [3] ARRU:The code can be accessed in (https://github.com/tso1257771/Attention-Recurrent-Residual-U-Net-for-earthquake-detection)
-```
+
 
 # Data
 ## data format: 
