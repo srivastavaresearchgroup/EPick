@@ -1,5 +1,5 @@
-import os, sys
-import obspy
+import os
+import sys
 import pandas as pd
 import h5py
 import numpy as np
@@ -40,16 +40,17 @@ def make_stream(dataset):
     stream = obspy.Stream([tr_E, tr_N, tr_Z])
     return stream
 
-file_name = "../.hdf5"
-csv_file  = "../.csv"
+file_name = "./.hdf5"
+catalog_list  = "./.csv"
 
 # for seismic evevt reading the csv file into a dataframe:
-df = pd.read_csv(csv_file)
+df = pd.read_csv(catalog_list)
 df = df[(df.trace_category == 'earthquake_local')]
 df = df.drop_duplicates(subset=['source_id'], keep='first')
 
 dtfl = h5py.File(file_name, 'r')
 
+## example for STEAD dataset 
 for c, evi in enumerate(df['source_id'].to_list()[:100]):
     # evi denotes the trace name
     trace = df[(df.source_id)== str(evi)]['trace_name']
@@ -63,7 +64,6 @@ for c, evi in enumerate(df['source_id'].to_list()[:100]):
     s_st = df[(df.trace_name)==str(trace)]['s_arrival_sample']
     s_st = list(str(s_st).split(' ')[4].split('\n'))[0]
     s_st = float(s_st)
-
 
     #waveforms, 3 channels: first row: Z channel, second row: N channel, third row:E channel 
     st = make_stream(dataset)
@@ -89,7 +89,7 @@ for c, evi in enumerate(df['source_id'].to_list()[:100]):
     traces = np.array(label_obj)
 
     '''tfrecords file'''
-    output_name = "../"+ str(evi)+'.tfrecords'
+    output_name = "./"+ str(evi)+'.tfrecords'
     output_path = os.path.join('.', output_name)
     writer = DataWriter(output_path)
     writer.write(st_event.copy().normalize(), label_obj)
