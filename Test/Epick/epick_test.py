@@ -2,7 +2,7 @@
 This code is based on https://github.com/mingzhaochina/unet_cea
 """
 
-mport os, sys
+import os, sys
 import numpy as np
 import tensorflow as tf
 import pandas as pd
