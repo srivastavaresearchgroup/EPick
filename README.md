@@ -12,7 +12,7 @@ python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving
 
 # Testing
 
-[1] Epick testing: python ./Test/Epick/epick_test.py --tfrecords_dir datapath ---checkpoint_path saveed_model
+[1] Epick testing: python ./Test/Epick/epick_test.py --tfrecords_dir datapath ---checkpoint_path saved_model_checkpoint
 
 [2] PhaseNet: the code can be accessed in (https://github.com/wayneweiqiang/PhaseNet)
 
