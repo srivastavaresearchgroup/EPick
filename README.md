@@ -20,11 +20,6 @@ python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving
 
 [3] ARRU:The code can be accessed in (https://github.com/tso1257771/Attention-Recurrent-Residual-U-Net-for-earthquake-detection)
 
-
-# Data
-## data format: 
->.tfrecords
-
 # Cite
 If you use this code for your research, please cite it with the following bibtex entry.
 ```
