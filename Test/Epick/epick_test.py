@@ -17,14 +17,15 @@ import layers
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, f1_score, recall_score, precision_score
 from sklearn.metrics import classification_report
-import fnmatch,math
+import fnmatch, math
 import itertools
 from matplotlib.ticker import FuncFormatter
 import math
 
 # initial setting
 args = None
-def result(predict_images, t_labels):
+
+def result(prediction, true_labels):
   TE = FE = 0     ## TE: true earthquake and FE: false earthquake
   TN = FN = 0     ## TN: true pure noise and FN: false noise
   Final_true = []
@@ -35,71 +36,56 @@ def result(predict_images, t_labels):
   false_s = []
   d_pp = []
   d_ss = []
-  batch_size = predict_images.shape[0]
+  batch_size = prediction.shape[0]
   for i in range(batch_size):
-    image_array = predict_images[i, :, :]
-    p1 = np.argmax(image_array[:, 1], axis = 0)
-    for j in range(image_array.shape[0]):
-      if j!= p1:
-        image_array[j][1] = 0
-        s1 = np.argmax(image_array[:, 2], axis = 0)
-    for j in range(image_array.shape[0]):
-      if j!= s1:
-        image_array[j][2] = 0
-    image_array = np.argmax(image_array, axis = 1)
-    pre_labels = list(image_array) ## n =0, P = 1, S= 
-    true_n = list(t_labels[i, :, 0])        ## ture noise label
-    true_p = list(t_labels[i, :, 1])        ## true p label
-    true_s = list(t_labels[i, :, 2])        ## true s label
-    if true_n == [1]*6000 and pre_labels ==  [0]*6000:
-      TN += 1
-    if true_n == [1]*6000 and pre_labels != [0]*6000:
-      FE += 1
-    if true_n != [1]*6000 and pre_labels == [0]*6000:
-      FN += 1
-    false_p.append(true_p.index(1))
-    false_s.append(true_s.index(1))
-    if true_n != [1]*6000 and pre_labels != [0]*6000:
-      TE +=1
-      tp1 = true_p.index(1)
-      ts1 = true_s.index(1)
-      f_true[tp1] = 1
-      f_true[ts1] = 2
-      Final_true = Final_true + f_true
-      '''calculate the difference between true index and predicted index'''
-      pp = []
-      ss = []
-      for i in range(len(pre_labels)):
-        if pre_labels[i] == 1:
-          pp.append(i)
-          if len(pp)>1:
-            d_pp.append(pp[-1] - tp1)
-            if abs(tp1 - pp[-1]) < 10 or abs(tp1-pp[-1]) == 10
+      pred_array = prediction[i, :, :]
+      for j in range(pred_array.shape[0]):
+          if j!= np.argmax(pred_array[:, 1], axis = 0):
+              pred_array[j][1] = 0
+      for j in range(pred_array.shape[0]):
+          if j!=  np.argmax(pred_array[:, 2], axis = 0):
+              pred_array[j][2] = 0
+      pred_array = np.argmax(pred_array, axis = 1)
+      pre_labels = list(pred_array) 
+      true_n = list(true_labels[i, :, 0])        
+      true_p = list(true_labels[i, :, 1])       
+      true_s = list(true_labels[i, :, 2])   
+      if true_n == [1]*6000 and pre_labels ==  [0]*6000:
+          TN += 1
+      if true_n == [1]*6000 and pre_labels != [0]*6000:
+          FE += 1
+      if true_n != [1]*6000 and pre_labels == [0]*6000:
+          FN += 1
+      false_p.append(true_p.index(1))
+      false_s.append(true_s.index(1))
+      if true_n != [1]*6000 and pre_labels != [0]*6000:
+          TE +=1
+          tp1 = true_p.index(1)
+          ts1 = true_s.index(1)
+          f_true[tp1] = 1
+          f_true[ts1] = 2
+          Final_true = Final_true + f_true
+          '''calculate the difference between true index and predicted index'''
+          pp = []
+          ss = []
+
+          pp.append(pred_label.index(1))
+          d_pp.append(pp[-1] - tp1)
+          if abs(tp1 - pp[-1]) < 10 or abs(tp1-pp[-1]) == 10
               pre_labels[pp[-1]] = 0
               pre_labels[tp1] = 1
-            elif len(pp) == 1:
-              d_pp.append(pp[0] - tp1)
-              if abs(tp1 - pp[0]) < 10 or abs(tp1-pp[0]) == 10
-                pre_labels[pp[0]] = 0
-                pre_labels[tp1] = 1
-      for j in range(len(pre_labels)):
-        if pre_labels[j] == 2:
-          ss.append(j)
-          if len(ss)>1:
-            d_ss.append(ss[-1] - ts1)
-            if abs(ts1 - ss[-1])< 20 or abs(ts1 - ss[-1]) == 20:
+
+          ss.append(pred_labels.index(2))
+          d_ss.append(ss[-1] - ts1)
+          if abs(ts1 - ss[-1])< 20 or abs(ts1 - ss[-1]) == 20:
               pre_labels[ss[-1]] = 0
               pre_labels[ts1] = 2
-          elif len(ss) == 1:
-            d_ss.append(ss[0] - ts1)
-            if abs(ts1 - ss[0])< 20 or abs(ts1-ss[0])==20:
-              pre_labels[ss[0]] = 0
-              pre_labels[ts1] = 2
-  Final_pre = Final_pre + pre_labels
-  Final_p += d_pp
-  Final_s += d_ss       
-  return TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s
-    
+
+    Final_pre = Final_pre + pre_labels
+    Final_p += d_pp
+    Final_s += d_ss       
+    return TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s
+
 def test():
     tf.compat.v1.set_random_seed(24)
     cfg = config.Config()
@@ -110,9 +96,9 @@ def test():
     cfg.n_epochs = 1
 
     pos_pipeline = dp.DataPipeline(args.tfrecords_dir, cfg, False)
-    waveform = pos_pipeline.samples 
+    waveforms = pos_pipeline.samples 
     labels = pos_pipeline.labels   
-    logits = model(waveform, args.num_classes, True) 
+    logits = model(waveforms, args.num_classes, True) 
     
     accuracy = accuracy(logits, labels)
     loss = loss(logits, labels, args.weight_decay_rate)
@@ -125,11 +111,10 @@ def test():
     sess.run(init_op)
     saver = tf.compat.v1.train.Saver() 
     
-    ## loading savee model
+    ## loading savd model
     if not tf.io.gfile.exists(args.checkpoint_path + '.meta'):
         raise ValueError("Can't find checkpoint file")
     else:
-        print('[INFO   ]\t Found checkpoint file, restoring model.') 
         saver.restore(sess, args.checkpoint_path)  # reload the trained model
 
     coord = tf.compat.v1.train.Coordinator() 
@@ -152,7 +137,6 @@ def test():
     try:
         while not coord.should_stop():
             loss_value, predicted_images_value, images_value,  ss_labels= sess.run([loss, predicted_images, images, labels])
-    
             TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s = result(predicted_images_value, ss_labels)
             total_TE += TE
             total_FE += FE
@@ -185,61 +169,17 @@ def test():
     print("earthquake_detection_recall: ",  E_recall)
     print("earthquake_detection_f1: ", E_f1)
 
-
-    ''' Confusion matrix for earthquake and non-earthqule '''
-    cm1= confusion_matrix([0, 0, 0, 0], [1, 1, 1, 1])  ## initialize
-    cm1[0][0] = total_TN
-    cm1[0][1] = total_FE
-    cm1[1][0] = total_FN
-    cm1[1][1] = total_TE
-    multi_label1 = [ 'Noise', 'Earthquake']
-    tick_marks = np.arange(len(multi_label1))
-    plt.xticks(tick_marks, multi_label1, rotation=45)
-    plt.yticks(tick_marks, multi_label1)
-    thresh = cm1.max() / 2
-    for i, j in itertools.product(range(cm1.shape[0]), range(cm1.shape[1])):
-        plt.text(j, i, "{:,}".format(cm1[i, j]),horizontalalignment="center",
-                 color="white" if cm1[i, j] > thresh else "black",
-                 fontsize=10)
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.tight_layout()
-    plt.imshow(cm1, interpolation='nearest', cmap=plt.cm.GnBu)
-    plt.title('Confusion Matrix')
-    plt.colorbar()
-    plt.savefig('./earthquake_detection_confusion_matrix.jpg')
-    plt.show()
-
     cm2 = confusion_matrix(F_t, F_p) 
-    multi_label2 = ['Non-arrival', 'P-arrival', 'S-arrival' ]
-    tick_marks = np.arange(len(multi_label2))
-    plt.xticks(tick_marks, multi_label2, rotation=45)
-    plt.yticks(tick_marks, multi_label2)
-    thresh = cm2.max() / 2
-    for i, j in itertools.product(range(cm2.shape[0]), range(cm2.shape[1])):
-        plt.text(j, i, "{:,}".format(cm2[i, j]),horizontalalignment="center",
-                 color="white" if cm2[i, j] > thresh else "black",
-                 fontsize=10)
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.tight_layout()
-    plt.imshow(cm2, interpolation='nearest', cmap=plt.cm.GnBu)
-    plt.title('Confusion Matrix')
-    plt.colorbar()
-    plt.savefig('./phase_detection_confusion_matrix.jpg')
-    plt.show()
-
     Final_accuracy = (cm2[0][0]+cm2[1][1]+cm2[2][2])/(cm1[1][1]*6000)
     Final_precision = precision_score(F_t, F_p, average = 'weighted')
     Final_recall = recall_score(F_t, F_p, average = 'weighted')
     Final_f1 = f1_score(F_t, F_p, average = 'weighted')
-    print("Final_detection_accuracy: ",Final_accuracyc)
+    print("Final_detection_accuracy: ",Final_accuracy)
     print("Final_detection_precision: ", Final_precision)
     print("Final_detection_recall: ",  Final_recall)
     print("Final_detection_f1: ", Final_f1)
     
-   
-    print('classification report: ', classification_report(F_t, F_p, target_names=['Neither', 'P phase', 'S phase'], digits=5))
+    print('classification report: ', classification_report(F_t, F_p, target_names=['Non-arrival', 'P phase', 'S phase'], digits=5))
    
     p_error = [int(Final_p_error[i])/100.0 for i in range(len(Final_p_error))] ## converting smaples to time (s)
     p_error_mean = sum(p_error)/len(p_error)
@@ -253,27 +193,7 @@ def test():
     print("P pick standard deviation = ", p_error_std)
     print("S pick mean = ", s_error , file = doc)
     print("S pick standard deviation = ", s_error_std)
-
-    ''' plot P-arrival time error histogram '''
-    plt.figure()
-    plt.hist(p_error, bins= 20, facecolor = 'blue', edgecolor = 'black', linewidth=0.2, log = True)
-    plt.xlabel("Time residuals (s)",fontsize = 12)
-    plt.ylabel("Number of P picks", fontsize = 12)
-    plt.title("Distribution of time residuals of P picks", fontsize = 12)
-    plt.tight_layout()
-    plt.savefig('./P_histogram.jpg', dpi =600)
-    plt.close()
     
-    ''' plot S-arrival time error histogram '''
-    plt.figure()
-    plt.hist(s_error, bins = 20, facecolor = 'blue', edgecolor = 'black', linewidth=0.2, log = True)
-    plt.xlabel("Time residuals (s)",fontsize = 12)
-    plt.ylabel("Numeber of S picks", fontsize = 12)
-    plt.title("Distribution of time residual of S picks", fontsize = 12)
-    plt.tight_layout()
-    plt.savefig('./S_histogram.jpg', dpi =600)
-    plt.close()
-
     ## Wait for thread 
     coord.join(threads) 
     sess.close()
@@ -286,17 +206,14 @@ def main(_):
     test()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description= 'Test Unet on given tfrecords.')
-    parser.add_argument('--tfrecords_dir',    help ='Tfrecords directory',default = './stead_test_data/')
+    parser = argparse.ArgumentParser(description= 'Model testing')
+    parser.add_argument('--tfrecords_dir', help ='Tfrecords directory',default = './')
     parser.add_argument('--tfrecords_prefix', help = 'Tfrecords prefix', default = 'tfrecords')
-    parser.add_argument('--checkpoint_path',  help ='Path of checkpoint to restore',
-                       default = './model.ckpt')
-    parser.add_argument('--num_classes',      help = 'Number of segmentation labels', type = int, default = 3)
-    parser.add_argument('--waveform_length',       help = 'Target image size (resize)', type = int, default = 6000)
-    parser.add_argument('--batch_size',       help = 'Batch size', type = int, default = 4)
-    parser.add_argument('--output_dir',
-                        help = 'Output directory for the prediction files. If this is not set then predictions will not be saved',
-                        default = './output/')
-    parser.add_argument('--weight_decay_rate', help = 'Weight decay rate', type = float, default = 0.0005)                    
+    parser.add_argument('--checkpoint_path', help ='Path of checkpoint to restore', default = './model.ckpt')
+    parser.add_argument('--num_classes', help = 'Number of segmentation labels', type = int, default = 3)
+    parser.add_argument('--waveform_length', help = 'Waveform length)', type = int, default = 6000)
+    parser.add_argument('--batch_size', help = 'Batch size', type = int, default = 4)
+    parser.add_argument('--weight_decay_rate', help = 'Weight decay rate', type = float, default = 0.0005)       
+    parser.add_argument('--output_dir', help = 'Output directory for the prediction files.', default = './output/')
     args, unparsed = parser.parse_known_args()
     tf.compat.v1.app.run()
