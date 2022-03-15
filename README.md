@@ -4,9 +4,11 @@ This is an implementation of the EPick model (https://arxiv.org/abs/2109.02567).
 # Requirements
 ```
 Python 3.8
-Tensorflow-gpu 2.5
-CUDA 11.2
+Tensorflow 2.5
 ```
+# Dataset creating
+python ./Dataprocessing/data_labeling.py file(e.g., h5 format) csv_file(e.g., catalog.csv) output_path
+
 # Training
 python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving_path hyperparameters setting like batch_size,  epochs
 
