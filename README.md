@@ -8,7 +8,7 @@ Tensorflow-gpu 2.5
 CUDA 11.2
 ```
 # Train
-python ./Train/train.py --tfrecords_dir "dataset" --checkpoint_dir model
+python ./Train/train.py --tfrecords_dir datapath --checkpoint_dir model_saving_path
 # Data
 ## data format: 
 >.tfrecords
