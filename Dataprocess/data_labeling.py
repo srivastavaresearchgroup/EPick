@@ -1,3 +1,6 @@
+'''
+This code is developed from https://github.com/smousavi05/STEAD
+'''
 import os
 import sys
 import pandas as pd
@@ -43,33 +46,32 @@ def make_stream(dataset):
 file_name = "./.hdf5"
 catalog_list  = "./.csv"
 
-# for seismic evevt reading the csv file into a dataframe:
+# reading the csv file into a dataframe:
 df = pd.read_csv(catalog_list)
-df = df[(df.trace_category == 'earthquake_local')]
-df = df.drop_duplicates(subset=['source_id'], keep='first')
+df = df[(df.trace_category == 'earthquake_local')] ## selecting local earthquake event
+df = df.drop_duplicates(subset=['source_id'], keep='first') 
 
 dtfl = h5py.File(file_name, 'r')
 
 ## example for STEAD dataset 
 for c, evi in enumerate(df['source_id'].to_list()[:100]):
-    # evi denotes the trace name
+    # evi: trace name
     trace = df[(df.source_id)== str(evi)]['trace_name']
     trace = list(str(trace).split(' ')[4].split('\n'))[0]
     dataset = dtfl.get('data/'+str(trace)) 
 
-    p_st = df[(df.trace_name)==str(trace)]['p_arrival_sample']
+    p_st = df[(df.trace_name)==str(trace)]['p_arrival_sample'] # P-arrival sample
     p_st = list(str(p_st).split(' ')[4].split('\n'))[0]
     p_st = float(p_st)
 
-    s_st = df[(df.trace_name)==str(trace)]['s_arrival_sample']
+    s_st = df[(df.trace_name)==str(trace)]['s_arrival_sample'] # S-arrival sample
     s_st = list(str(s_st).split(' ')[4].split('\n'))[0]
     s_st = float(s_st)
 
-    #waveforms, 3 channels: first row: Z channel, second row: N channel, third row:E channel 
+    #three-channels waveform
     st = make_stream(dataset)
-    # window_size = 60
     st_event =st
-    
+
     ## label initialization
     label_obj = st_event.copy()
     label_obj[0].data[...] = 1
@@ -79,14 +81,6 @@ for c, evi in enumerate(df['source_id'].to_list()[:100]):
     ## labeling arrival time of P and S waves
     label_obj[1].data[int(p_st)] = 1
     label_obj[2].data[int(s_st)] = 2
-
-    traces = Stream()
-    label_obj[0].stats.channel="N"
-    label_obj[1].stats.channel="P"
-    label_obj[2].stats.channel="S"
-    traces += label_obj
-    traces.normalize().plot()
-    traces = np.array(label_obj)
 
     '''tfrecords file'''
     output_name = "./"+ str(evi)+'.tfrecords'
