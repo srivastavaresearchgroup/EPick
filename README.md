@@ -9,6 +9,9 @@ CUDA 11.2
 ```
 # Train
 python ./Train/train.py --tfrecords_dir datapath --checkpoint_dir model_saving_path
+
+# Test
+python ./Test/Epick/epick_test.py --tfrecords_dir datapath ---checkpoint_path saveed_model
 # Data
 ## data format: 
 >.tfrecords
