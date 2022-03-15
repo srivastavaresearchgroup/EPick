@@ -6,6 +6,36 @@ from tensorflow.python.framework import ops
 from tensorflow.python.ops import gen_nn_ops
 import numpy as np
 
+def conv(inputs, kernel_size, num_outputs, name, stride_size = 1, padding = 'SAME', activation_fn = tf.nn.relu):
+    """
+    Convolution layer followed by activation fn:
+    ----------
+    Args:
+        inputs: Tensor, [batch_size, height, width, channels]
+        kernel_size: filter size
+        num_outputs: Integer, number of convolution filters
+        name: String, scope name
+        stride_size: List, convolution stide [height, width]
+        padding: String, input padding
+        activation_fn: Tensor fn, activation function on output (can be None)
+    Returns:
+        outputs: Tensor, [batch_size, height+-, width+-, num_outputs]
+    """
+
+    with tf.compat.v1.variable_scope(name):
+        num_filters_in = inputs.get_shape()[-1]
+        kernel_shape   = [kernel_size, num_filters_in, num_outputs]
+        stride_shape   = stride_size
+
+        weights = tf.compat.v1.get_variable('weights', kernel_shape, tf.float32, tf.compat.v1.glorot_uniform_initializer())
+        bias    = tf.compat.v1.get_variable('bias', [num_outputs], tf.float32, tf.constant_initializer(0.0))
+        conv    = tf.nn.conv1d(inputs, weights, stride_shape, padding = padding)
+        outputs = tf.nn.bias_add(conv, bias)
+
+        if activation_fn is not None:
+            outputs = activation_fn(outputs)
+        return outputs
+    
 def conv_btn(inputs, kernel_size, num_outputs, name, is_training = True, stride_size=1 , padding = 'SAME', activation_fn = tf.nn.relu):
     """
     Convolution layer followed by batch normalization then activation fn:
