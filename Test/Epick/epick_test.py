@@ -183,15 +183,26 @@ def test():
         """When done, ask the threads to stop."""
         coord.request_stop()
 
-    ''' Metrics of earthquake detection '''
-    E_accuracy = (total_TE + total_TN)/(step*args.batch_size)
-    E_precision = total_TE/(total_TE + total_FE)
-    E_recall =  total_TE/(total_TE + total_FN)
-    E_f1 = 2 * E_precision * E_recall/(E_precision + E_recall)
-    print("earthquake_detection_accuracy: ", E_accuracy)
-    print("earthquake_detection_precision: ", E_precisionc)
-    print("earthquake_detection_recall: ",  E_recall)
-    print("earthquake_detection_f1: ", E_f1)
+    cm1= confusion_matrix([0, 0, 0, 0], [1, 1, 1, 1])  ## initialize
+    cm1[0][0] = total_TN
+    cm1[0][1] = total_FE
+    cm1[1][0] = total_FN
+    cm1[1][1] = total_TE
+    multi_label1 = [ 'Non-earthquake', 'Earthquake']
+    tick_marks = np.arange(len(multi_label1))
+    plt.xticks(tick_marks, multi_label1, rotation=45)
+    plt.yticks(tick_marks, multi_label1)
+    thresh = cm1.max() / 2
+    for i, j in itertools.product(range(cm1.shape[0]), range(cm1.shape[1])):
+        plt.text(j, i, "{:,}".format(cm1[i, j]),horizontalalignment="center", color="white" if cm1[i, j] > thresh else "black", fontsize=10)
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+    plt.imshow(cm1, interpolation='nearest', cmap=plt.cm.GnBu)
+    plt.title('Result of seismic event detection')
+    plt.colorbar()
+    plt.savefig('./earthquake_detection.jpg')
+    plt.close()
 
     cm2 = confusion_matrix(F_t, F_p) 
     Final_accuracy = (cm2[0][0]+cm2[1][1]+cm2[2][2])/(cm1[1][1]*6000)
@@ -205,18 +216,18 @@ def test():
     
     print('classification report: ', classification_report(F_t, F_p, target_names=['Non-arrival', 'P phase', 'S phase'], digits=5))
    
-    p_error = [int(Final_p_error[i])/100.0 for i in range(len(Final_p_error))] ## converting smaples to time (s)
+    p_error = [int(i)/100.0 for i in Final_p_error] ## converting smaples to time (s)
     p_error_mean = sum(p_error)/len(p_error)
     p_error_std = statistics.stdev(p_error)
     
-    s_error = [int(Final_s_error[i])/100.0 for i in range(len(Final_s_error))]
+    s_error = [int(i)/100.0 for i in Final_s_error]
     s_error_mean = sum(s_error)/len(s_error)
     s_error_std = statistics.stdev(s_error)
 
-    print("P pick mean = ", p_error, file=doc)
-    print("P pick standard deviation = ", p_error_std)
-    print("S pick mean = ", s_error , file = doc)
-    print("S pick standard deviation = ", s_error_std)
+    print("P-pick mean = ", p_error)
+    print("P-pick standard deviation = ", p_error_std)
+    print("S-pick mean = ", s_error , file = doc)
+    print("S-pick standard deviation = ", s_error_std)
     
     ## Wait for thread 
     coord.join(threads) 
