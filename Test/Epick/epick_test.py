@@ -25,65 +25,89 @@ import math
 # initial setting
 args = None
 
-def result(prediction, true_labels):
-  TE = FE = 0     ## TE: true earthquake and FE: false earthquake
-  TN = FN = 0     ## TN: true pure noise and FN: false noise
-  Final_true = []
-  Final_pre = []
-  Final_p = [] # P index difference between true and predict
-  Final_s = [] # S index difference between true and predict
-  false_p = []
-  false_s = []
-  d_pp = []
-  d_ss = []
-  batch_size = prediction.shape[0]
-  for i in range(batch_size):
-      pred_array = prediction[i, :, :]
-      for j in range(pred_array.shape[0]):
-          if j!= np.argmax(pred_array[:, 1], axis = 0):
-              pred_array[j][1] = 0
-      for j in range(pred_array.shape[0]):
-          if j!=  np.argmax(pred_array[:, 2], axis = 0):
-              pred_array[j][2] = 0
-      pred_array = np.argmax(pred_array, axis = 1)
-      pre_labels = list(pred_array) 
-      true_n = list(true_labels[i, :, 0])        
-      true_p = list(true_labels[i, :, 1])       
-      true_s = list(true_labels[i, :, 2])   
-      if true_n == [1]*6000 and pre_labels ==  [0]*6000:
-          TN += 1
-      if true_n == [1]*6000 and pre_labels != [0]*6000:
-          FE += 1
-      if true_n != [1]*6000 and pre_labels == [0]*6000:
-          FN += 1
-      false_p.append(true_p.index(1))
-      false_s.append(true_s.index(1))
-      if true_n != [1]*6000 and pre_labels != [0]*6000:
-          TE +=1
-          tp1 = true_p.index(1)
-          ts1 = true_s.index(1)
-          f_true[tp1] = 1
-          f_true[ts1] = 2
-          Final_true = Final_true + f_true
-          '''calculate the difference between true index and predicted index'''
-          pp = []
-          ss = []
+def result(predict_images, t_labels):
+    TE = FE = 0     ## TE: true earthquake and FE: false earthquake
+    TN = FN = 0     ## TN: true pure noise and FN: false noise
+    Final_true = []
+    Final_pre = []
+    Final_p = [] # P index difference between true and predict
+    Final_s = [] # S index difference between true and predict
+    false_p = []
+    false_s = []
 
-          pp.append(pred_label.index(1))
-          d_pp.append(pp[-1] - tp1)
-          if abs(tp1 - pp[-1]) < 10 or abs(tp1-pp[-1]) == 10
-              pre_labels[pp[-1]] = 0
-              pre_labels[tp1] = 1
+    batch_size = predict_images.shape[0]
+    for i in range(batch_size):
+        '''sletect the one with largest probability given multipe P phases or S phases'''
+        d_pp = []
+        d_ss = []
+        image_array = predict_images[i, :, :]  ## [image_size, 3]
+        p1 = np.argmax(list(image_array[:, 1]))
+        for j in range(image_array.shape[0]):
+            if j!= p1:
+                image_array[j][1] = 0
+        s1 = np.argmax(list(image_array[:, 2]))
+        for j in range(image_array.shape[0]):
+            if j!= s1:
+                image_array[j][2] = 0
+        image_array = np.argmax(image_array, axis = 1)
+        pre_labels = list(image_array) ## n =0, P = 1, S= 2
+        
+        true_n = list(t_labels[i, :, 0])        ## ture noise label
+        true_p = list(t_labels[i, :, 1])        ## true p label
+        true_s = list(t_labels[i, :, 2])        ## true s label
+        
+        ## true label
+        f_true = [0] * 6000
+        if true_n != [1]*6000:
+            tp1 = true_p.index(1)
+            ts1 = true_s.index(1)
+            f_true[tp1] = 1
+            f_true[ts1] = 2
+            
+        ## earthquake signal and pure noise (non-earthquake signal)
+        if true_n == [1]*6000 and pre_labels ==  [0]*6000:
+            TN += 1
+        if true_n == [1]*6000 and pre_labels != [0]*6000:
+            FE += 1
+        if true_n != [1]*6000 and pre_labels == [0]*6000:
+            FN += 1
+            false_p.append(true_p.index(1))
+            false_s.append(true_s.index(1))
+        if true_n != [1]*6000 and pre_labels != [0]*6000 and pre_labels.count(1)==1 and pre_labels.count(2)==1:
+            TE += 1     
+            pp = []
+            ss = []
+            ## p-arrival
+            if 1 not in pre_labels:
+                pre_p = 10000
+                pp.append(pre_p)
+                d_pp.append(pre_p-tp1)
+            else:
+                pre_p = pre_labels.index(1)
+                pp.append(pre_p)
+                d_pp.append(pre_p-tp1)
+                if abs(pre_p-tp1)<= 10: ## uncertainty interval: 10 samples
+                    pre_labels[pre_p] = 0
+                    pre_labels[tp1] = 1
+                
+            ## s-arrival
+            if 2 not in pre_labels:
+                pre_s = 10000
+                ss.append(pre_s)
+                d_ss.append(pre_s-ts1)
+            else:
+                pre_s = pre_labels.index(2)
+                ss.append(pre_s)
+                d_ss.append(pre_s-ts1)
+                if abs(pre_s-ts1)<= 20:  ## uncertainty interval: 20 samples
+                    pre_labels[pre_s] = 0
+                    pre_labels[ts1] = 2
 
-          ss.append(pred_labels.index(2))
-          d_ss.append(ss[-1] - ts1)
-          if abs(ts1 - ss[-1])< 20 or abs(ts1 - ss[-1]) == 20:
-              pre_labels[ss[-1]] = 0
-              pre_labels[ts1] = 2
-
-    Final_pre = Final_pre + pre_labels
-    Final_p += d_pp
-    Final_s += d_ss       
+        Final_pre += pre_labels
+        Final_true += f_true
+        Final_p += d_pp
+        Final_s += d_ss
+            
     return TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s
 
 def test():
