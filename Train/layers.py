@@ -60,7 +60,6 @@ def conv_btn(inputs, kernel_size, num_outputs, name, is_training = True, stride_
         bias    = tf.compat.v1.get_variable('bias', num_outputs, tf.float32, tf.compat.v1.constant_initializer(0.0))
         conv    = tf.nn.conv1d(inputs, weights, stride_shape, padding = padding, dilations=1)
         outputs = tf.nn.bias_add(conv, bias)
-        outputs = tf.compat.v1.layers.batch_normalization(outputs, center = True, scale = True, training = is_training)
         if activation_fn is not None:
             outputs = activation_fn(outputs)
         return outputs
