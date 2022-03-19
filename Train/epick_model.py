@@ -10,7 +10,7 @@ import numpy as np
 
 def model (inputs, num_classes, is_training):
 
-    dropout_keep_prob = tf.where(is_training, 0.2, 1.0)
+    rate = tf.where(is_training, 0.2, 0.0) ## dropout rate
 
     # Encoder 
     conv0_1 = layers.conv_btn(inputs, 3, 32, 'conv0_1', is_training  = is_training)
@@ -101,7 +101,7 @@ def segmentation_loss(logits, labels, class_weights = None):
     segment_loss  = tf.reduce_mean(cross_entropy, name = 'segment_loss')
     return segment_loss
 
-def l2_loss():
+def l2_loss(): # regularization
     weights = [var for var in tf.compat.v1.trainable_variables() if var.name.endswith('weights:0')]
     l2_loss = tf.add_n([tf.nn.l2_loss(w) for w in weights])
     return l2_loss
