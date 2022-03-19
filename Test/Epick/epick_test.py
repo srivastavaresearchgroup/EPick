@@ -122,7 +122,7 @@ def test():
     pos_pipeline = dp.DataPipeline(args.tfrecords_dir, cfg, False)
     waveforms = pos_pipeline.samples 
     labels = pos_pipeline.labels   
-    logits = model(waveforms, args.num_classes, True) 
+    logits = model(waveforms, args.num_classes, False) 
     
     accuracy = accuracy(logits, labels)
     loss = loss(logits, labels, args.weight_decay_rate)
@@ -203,20 +203,8 @@ def test():
     plt.colorbar()
     plt.savefig('./earthquake_detection.jpg')
     plt.close()
-
-    cm2 = confusion_matrix(F_t, F_p) 
-    Final_accuracy = (cm2[0][0]+cm2[1][1]+cm2[2][2])/(cm1[1][1]*6000)
-    Final_precision = precision_score(F_t, F_p, average = 'weighted')
-    Final_recall = recall_score(F_t, F_p, average = 'weighted')
-    Final_f1 = f1_score(F_t, F_p, average = 'weighted')
-    print("Final_detection_accuracy: ",Final_accuracy)
-    print("Final_detection_precision: ", Final_precision)
-    print("Final_detection_recall: ",  Final_recall)
-    print("Final_detection_f1: ", Final_f1)
     
-    print('classification report: ', classification_report(F_t, F_p, target_names=['Non-arrival', 'P phase', 'S phase'], digits=5))
-   
-    p_error = [int(i)/100.0 for i in Final_p_error] ## converting smaples to time (s)
+    p_error = [int(i)/100.0 for i in Final_p_error] ## converting samples to second
     p_error_mean = sum(p_error)/len(p_error)
     p_error_std = statistics.stdev(p_error)
     
