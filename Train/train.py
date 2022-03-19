@@ -109,7 +109,7 @@ def main(_):
     train()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'training .')
+    parser = argparse.ArgumentParser(description = 'training.')
     parser.add_argument('--tfrecords_dir', help = 'Tfrecords directory', default='../')
     parser.add_argument('--tfrecords_prefix', help = 'Tfrecords prefix', default = 'tfrecords')
     parser.add_argument('--checkpoint_dir', help = 'Checkpoints directory', default ='../')
