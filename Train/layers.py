@@ -60,6 +60,7 @@ def conv_btn(inputs, kernel_size, num_outputs, name, is_training = True, stride_
         bias    = tf.compat.v1.get_variable('bias', num_outputs, tf.float32, tf.compat.v1.constant_initializer(0.0))
         conv    = tf.nn.conv1d(inputs, weights, stride_shape, padding = padding, dilations=1)
         outputs = tf.nn.bias_add(conv, bias)
+        outputs = tf.compat.v1.layers.batch_normalization(outputs, center = True, scale = True, training = is_training)
         if activation_fn is not None:
             outputs = activation_fn(outputs)
         return outputs
@@ -146,7 +147,7 @@ def maxpool(inputs, kernel_size, name, padding = 'SAME'):
           
     return outputs
 
-def dropout(inputs, keep_prob, name):
+def dropout(inputs, rate, name):
     """
     Dropout layer:
     ----------
@@ -159,7 +160,7 @@ def dropout(inputs, keep_prob, name):
         outputs: Tensor, [batch_size, height, width, channels]
     """
 
-    return tf.nn.dropout(inputs, rate= keep_prob, name = name)
+    return tf.nn.dropout(inputs, rate, name)
 
 def concat(inputs1, inputs2, name):
     """
