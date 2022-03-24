@@ -35,6 +35,7 @@ def train():
     cfg.add = 1
     cfg.n_clusters = args.num_classes
     cfg.n_clusters += 1
+    cfg.n_epochs = FLAGS.num_epochs
 
     data_files, data_size = load_datafiles(args.tfrecords_prefix)
     pos_pipeline = dp.DataPipeline(args.tfrecords_dir, cfg, True)
@@ -65,7 +66,7 @@ def train():
     threads = tf.compat.v1.train.start_queue_runners(sess = sess, coord = coord)
     start_time = time.time()
     
-    p_acc =[]
+    p_acc = []
     s_acc = []
     loss_list =[]
     try:
@@ -74,7 +75,7 @@ def train():
             _, loss_value, summary = sess.run([train_op, loss, merged])
             writer.add_summary(summary, step)
 
-            if step % 1000 == 0:
+            if step % 5000 == 0:
                 acc_seg_value = sess.run([accuarcy])
                 epoch = step * args.batch_size / data_size
                 duration = time.time() - start_time
