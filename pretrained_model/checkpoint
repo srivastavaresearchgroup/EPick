@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/wli/Epick/train_model/pertained_model/model.ckpt-0"
+all_model_checkpoint_paths: "/home/wli/Epick/train_model/pertained_model/model.ckpt-0"
