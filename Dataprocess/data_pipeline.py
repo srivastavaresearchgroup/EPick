@@ -33,13 +33,14 @@ class DataWriter(object):
         label = np.zeros((n_traces, n_samples), dtype=np.float32)
         for i in range(n_traces):
             label[i, :] = labels[i].data[...]
-        #print label
+        
 
         # Extract metadata (csv file)
         start_time = np.int64(sample_window[0].stats.starttime.timestamp)
         end_time = np.int64(sample_window[0].stats.endtime.timestamp)
 
         example = tf.train.Example(features=tf.train.Features(feature={
+            'trace_name': self._bytes_feature(trace_name.encode('utf-8')),
             'window_size': self._int64_feature(n_samples),
             'n_traces': self._int64_feature(n_traces),
             'data': self._bytes_feature(data.tobytes()),
@@ -92,6 +93,7 @@ class DataReader(object):
         features = tf.io.parse_single_example(
             serialized_example,
             features={
+                'trace_name': tf.io.FixedLenFeature([], tf.string),
                 'window_size': tf.io.FixedLenFeature([], tf.int64),
                 'n_traces': tf.io.FixedLenFeature([], tf.int64),
                 'data': tf.io.FixedLenFeature([], tf.string),
@@ -149,14 +151,14 @@ class DataPipeline(object):
             with tf.name_scope('validation_inputs'):
                 self._reader = DataReader(dataset_path, config=config)
                 samples = self._reader.read()
-
+                sample_trace_name = samples['trace_name']
                 sample_input = samples["data"]
                 sample_target = samples["label"]
                 start_time = samples["start_time"]
                 end_time = samples["end_time"]
 
-                self.samples, self.labels, self.start_time, self.end_time = tf.compat.v1.train.batch(
-                    [sample_input, sample_target, start_time, end_time],
+                self.traces, self.samples, self.labels, self.start_time, self.end_time = tf.compat.v1.train.batch(
+                    [sample_trace_name, sample_input, sample_target, start_time, end_time],
                     batch_size = config.batch_size,
                     capacity = capacity,
                     num_threads = config.n_threads,
