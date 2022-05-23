@@ -25,7 +25,7 @@ import math
 # initial setting
 args = None
 
-def result(predict_images, t_labels):
+def result(predict_images, t_labels, trace_names):
     TE = FE = 0     ## TE: true earthquake and FE: false earthquake
     TN = FN = 0     ## TN: true pure noise and FN: false noise
     Final_true = []
@@ -122,6 +122,7 @@ def test():
     pos_pipeline = dp.DataPipeline(args.tfrecords_dir, cfg, False)
     waveforms = pos_pipeline.samples 
     labels = pos_pipeline.labels   
+    trace_lists = pos_pipeline.traces
     logits = model(waveforms, args.num_classes, False) 
     
     accuracy = accuracy(logits, labels)
@@ -160,8 +161,8 @@ def test():
 
     try:
         while not coord.should_stop():
-            loss_value, predicted_images_value, images_value,  ss_labels= sess.run([loss, predicted_images, images, labels])
-            TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s = result(predicted_images_value, ss_labels)
+            loss_value, predicted_images_value, images_value,  ss_labels, trace_names = sess.run([loss, predicted_images, images, labels, trace_lists])
+            TE, FE, TN, FN, Final_pre, Final_true, Final_p, Final_s, false_p, false_s = result(predicted_images_value, ss_labels, trace_names)
             total_TE += TE
             total_FE += FE
             total_TN += TN
