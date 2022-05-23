@@ -11,6 +11,9 @@ python ./Dataprocessing/data_labeling.py file_name='./.h5' catalog_list='.csv' o
 ```
 This script generated TFRecord files in length of 60s for STEAD dataset, please download it and replace the file_name and catalog_list.
 ```
+```
+The dataset folder provides several examples in tfrecords including earthquake and non-earthquake STEAD data.
+```
 # Training
 python ./Train/train.py --tfrecords_dir = datapath --checkpoint_dir=model_saving_path with hyperparameters including batch_size,  epochs, learning_rate, weight_decay_factor, etc
 
