@@ -11,5 +11,5 @@ class Config(object):
     self.regularization = 1e-3
     self.n_clusters = None
 
-    # Number of epochs, None is infinite
-    n_epochs = None
+    # Number of epochs, None means infinite
+    n_epochs = 50
